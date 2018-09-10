@@ -26,7 +26,7 @@ Press **F9** to stop and reset the timer.\
 Enable the **Mouse trigger** checkbox to start the timer via mouse.\
 Press **F9** to make sure the timer is stopped.\
 Press **F10** to engage the timer. Now press the left or right mouse button to start the timer.\\
-To use mouse button release as trigger press F10 to engage the trigger while holding a mouse button.
+To use mouse button release as trigger press **F10** to engage the trigger while holding a mouse button.
 
 
 
