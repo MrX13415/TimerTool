@@ -41,24 +41,24 @@ namespace TimerTool
         private static IntPtr HookCallback(
           int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && MouseMessages.WM_LBUTTONDOWN == (MouseMessages)wParam)
+            if (nCode >= 0)
             {
                 MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
-                MouseAction(null, new EventArgs());
+                MouseAction(null, new MouseEventArgs((MouseMessages)wParam));
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
 
         private const int WH_MOUSE_LL = 14;
 
-        private enum MouseMessages
+        public enum MouseMessages
         {
-            WM_LBUTTONDOWN = 0x0201,
-            WM_LBUTTONUP = 0x0202,
-            WM_MOUSEMOVE = 0x0200,
-            WM_MOUSEWHEEL = 0x020A,
-            WM_RBUTTONDOWN = 0x0204,
-            WM_RBUTTONUP = 0x0205
+            ButtonLeftDown  = 0x0201,
+            ButtonLeftUp    = 0x0202,
+            ButtonRightDown = 0x0204,
+            ButtonRightUp   = 0x0205,
+            MouseMove       = 0x0200,
+            MouseWheel      = 0x020A
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -94,5 +94,14 @@ namespace TimerTool
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
 
+        public class MouseEventArgs : EventArgs
+        {
+            public MouseMessages MouseMessage { get; private set; }
+
+            public MouseEventArgs(MouseMessages mouseMessage)
+            {
+                this.MouseMessage = mouseMessage;
+            }
+        }
     }
 }

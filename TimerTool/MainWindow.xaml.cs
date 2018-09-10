@@ -11,12 +11,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static TimerTool.MouseHook;
 
 namespace TimerTool
 {
@@ -52,7 +52,18 @@ namespace TimerTool
 
         private void MouseEvent(object sender, EventArgs e)
         {
-            OnMouseClick();
+            switch ((e as MouseEventArgs).MouseMessage)
+            {
+                case MouseMessages.ButtonLeftDown:
+                case MouseMessages.ButtonLeftUp:
+                case MouseMessages.ButtonRightDown:
+                case MouseMessages.ButtonRightUp:
+                    OnMouseClick();
+                    break;
+                case MouseMessages.MouseMove:
+                case MouseMessages.MouseWheel:
+                    break;
+            }
         }
 
         [DllImport("User32.dll")]
