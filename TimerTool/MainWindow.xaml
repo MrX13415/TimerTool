@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimerTool"
         mc:Ignorable="d"
-        Title="TimerTool - v1.1" Height="200" Width="300" Loaded="Window_Loaded" MinWidth="300" MinHeight="200">
+        Title="TimerTool - v1.2" Height="200" Width="300" Loaded="Window_Loaded" MinWidth="300" MinHeight="200" MaxHeight="200" KeyDown="Window_KeyDown">
     <Grid Margin="0,0,2,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="19*"/>
             <ColumnDefinition Width="39*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="150*"/>
+            <RowDefinition Height="126*"/>
+            <RowDefinition Height="24*"/>
             <RowDefinition Height="19*"/>
         </Grid.RowDefinitions>
         <DockPanel Height="59" LastChildFill="False" VerticalAlignment="Top" Margin="0,10,52,0" RenderTransformOrigin="0.51,0.57" HorizontalAlignment="Right" Width="228" Grid.ColumnSpan="2">
@@ -22,9 +23,31 @@
         </DockPanel>
         <Label x:Name="TimerLabelLabel" Content="sec" Margin="0,24,10,0" IsEnabled="False" FontSize="24" IsTabStop="True" FontFamily="Segoe UI Light" Padding="5,5,5,5" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1"/>
         <Label x:Name="StatusLabel" Content="⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯" Margin="10,60,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.158,-1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="#FF0074AA" FontSize="16" FontFamily="Segoe UI Semibold" Height="37" Grid.ColumnSpan="2"/>
-        <Label x:Name="InfoLabel_F10" Content="F10 | Start" Margin="10,0,0,10" VerticalAlignment="Bottom" RenderTransformOrigin="0.158,-1" VerticalContentAlignment="Center" Foreground="#FF0074AA" FontFamily="Segoe UI Semibold" HorizontalAlignment="Left" Grid.RowSpan="2"/>
-        <Label x:Name="InfoLabel_F9" Content="F9 | Reset" Margin="78,0,0,10" VerticalAlignment="Bottom" RenderTransformOrigin="0.158,-1" VerticalContentAlignment="Center" Foreground="#FF0074AA" FontFamily="Segoe UI Semibold" HorizontalAlignment="Left" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
+        <Label x:Name="StartBtn" Content="x | Start" Margin="10,0,0,10" VerticalAlignment="Bottom" RenderTransformOrigin="0.158,-1" VerticalContentAlignment="Center" FontFamily="Segoe UI Semibold" HorizontalAlignment="Left" Grid.RowSpan="2" MouseDoubleClick="StartBtn_MouseDoubleClick" Grid.Row="1" BorderThickness="1" MouseLeftButtonUp="StartBtn_MouseLeftButtonUp">
+            <Label.Style>
+                <Style TargetType="Label">
+                    <Setter Property="Foreground" Value="#FF0074AA" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{x:Static SystemColors.HighlightBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Style>
+        </Label>
+        <Label x:Name="ResetBtn" Content="x | Reset" Margin="78,0,0,10" VerticalAlignment="Bottom" RenderTransformOrigin="0.158,-1" VerticalContentAlignment="Center" FontFamily="Segoe UI Semibold" HorizontalAlignment="Left" Grid.RowSpan="2" Grid.ColumnSpan="2" MouseDoubleClick="ResetBtn_MouseDoubleClick" Grid.Row="1" MouseLeftButtonUp="ResetBtn_MouseLeftButtonUp" BorderThickness="1" >
+            <Label.Style>
+                <Style TargetType="Label">
+                    <Setter Property="Foreground" Value="#FF0074AA" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{x:Static SystemColors.HighlightBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Style>
+        </Label>
         <Label x:Name="InfoLabel_Mouse" Margin="10,88,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Foreground="#FF0074AA" FontFamily="Segoe UI Semibold" FontSize="10" HorizontalContentAlignment="Center" Height="31" Grid.ColumnSpan="2" Content="MOUSE CLICK TO START"/>
-        <CheckBox x:Name="UseMouseCheckBox" Content="Mouse trigger" Margin="0,0,10,15" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" RenderTransformOrigin="0.381,0.533" Grid.RowSpan="2" />
+        <CheckBox x:Name="UseMouseCheckBox" Content="Mouse trigger" Margin="0,0,10,15" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" RenderTransformOrigin="0.381,0.533" Grid.RowSpan="2" Grid.Row="1" />
     </Grid>
 </Window>

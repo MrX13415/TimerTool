@@ -26,10 +26,32 @@ namespace TimerTool
     public partial class MainWindow : Window
     {
 
+        struct KeyInfo
+        {
+            public string KeyName { get; set; }
+            //See: https://docs.microsoft.com/en-us/windows/desktop/inputdev/virtual-key-codes
+            public int VK_Code { get; set; }
+
+            public KeyInfo(int virtualKey)
+            {
+                KeyName = System.Windows.Input.KeyInterop.KeyFromVirtualKey(virtualKey).ToString();
+                VK_Code = virtualKey;
+            }
+
+            public KeyInfo(System.Windows.Input.Key key)
+            {
+                KeyName = key.ToString();
+                VK_Code = System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
+            }
+        }
+
         int status = 0; // 0: nothing ; 1: engaged ; 2: running
 
-        Stopwatch timer = new Stopwatch();
+        int captureKey = 0; // 0: no capture ; 1: start key ; 2: reset key
+        KeyInfo key_Start = new KeyInfo(0x79);  // F10 (VK_F10)
+        KeyInfo key_Reset = new KeyInfo(0x78);  // F9 (VK_F9)
 
+        Stopwatch timer = new Stopwatch();
         BackgroundWorker uiworker = new BackgroundWorker();
 
         public MainWindow()
@@ -102,14 +124,14 @@ namespace TimerTool
         private void RegisterHotKey()
         {
             var helper = new WindowInteropHelper(this);
-            const uint VK_F10 = 0x79;
-            const uint VK_F09 = 0x78;
+            uint startKey = (uint)key_Start.VK_Code;
+            uint resetKey = (uint)key_Reset.VK_Code;
 
-            if (!RegisterHotKey(helper.Handle, HOTKEY_START_ID, 0, VK_F10))
+            if (!RegisterHotKey(helper.Handle, HOTKEY_START_ID, 0, startKey))
             {
                 // handle error
             }
-            if (!RegisterHotKey(helper.Handle, HOTKEY_RESET_ID, 0, VK_F09))
+            if (!RegisterHotKey(helper.Handle, HOTKEY_RESET_ID, 0, resetKey))
             {
                 // handle error
             }
@@ -225,9 +247,70 @@ namespace TimerTool
 
             StatusLabel.Content = str;
             InfoLabel_Mouse.Visibility = status == 1 ? Visibility.Visible : Visibility.Hidden;
+
+            if (captureKey == 0)
+            {
+                UpdateKeyBtn(StartBtn, key_Start.KeyName);
+                UpdateKeyBtn(ResetBtn, key_Reset.KeyName);
+            }
         }
 
+        private void UpdateKeyBtn(Label control, string key)
+        {
+            string text = (string)control.Content;
+            if (text.Length == 0) return;
+            if (!text.Contains("|")) return;
+            control.Content = key + " " + text.Substring(text.IndexOf("|"));
+        }
 
+        private void StartBtn_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (captureKey == 1)
+            {
+                captureKey = 0;
+                return;
+            }
+            if (captureKey != 0) return;
+            captureKey = 1;
+            UpdateKeyBtn(StartBtn, "\u2423"); // OpenBox char
+        }
+
+        private void ResetBtn_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (captureKey == 2)
+            {
+                captureKey = 0;
+                return;
+            }
+            if (captureKey != 0) return;
+            captureKey = 2;
+            UpdateKeyBtn(ResetBtn, "\u2423"); // OpenBox char
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (captureKey == 0) return;
+
+            KeyInfo key = new KeyInfo(e.Key);
+
+            if (captureKey == 1) key_Start = key;           
+            if (captureKey == 2)  key_Reset = key;
+        
+            UnregisterHotKey();
+            RegisterHotKey();
+
+            captureKey = 0;
+        }
+
+        private void StartBtn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            OnStartKeyPressed();
+        }
+
+        private void ResetBtn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            OnResetKeyPressed();
+        }
 
     }
 }
