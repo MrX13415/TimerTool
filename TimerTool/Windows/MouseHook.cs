@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TimerTool
+namespace TimerTool.Windows
 {
     public static class MouseHook
     {

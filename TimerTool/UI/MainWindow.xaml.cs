@@ -16,9 +16,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static TimerTool.MouseHook;
+using TimerTool.Windows;
+using static TimerTool.Windows.MouseHook;
 
-namespace TimerTool
+namespace TimerTool.UI
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
@@ -166,7 +167,6 @@ namespace TimerTool
             return IntPtr.Zero;
         }
 
-        public bool UseMouse { get { return (bool)(UseMouseCheckBox.IsChecked); } }
 
         private void OnMouseClick()
         {
@@ -184,7 +184,7 @@ namespace TimerTool
                 default:
                 case 0:
                     status = 1; 
-                    if (!UseMouse)
+                    if (!SettingsPane.MouseTriggerEnabled)
                     {
                         timer.Start();
                         status = 2; break;
@@ -228,8 +228,8 @@ namespace TimerTool
         {
             int sec = (int)(timer.ElapsedMilliseconds / 1000);
             double ms = timer.ElapsedMilliseconds - (sec * 1000);
-            TimerLabel_Seconds.Content = String.Format("{0}", sec);
-            TimerLabel_Millis.Content = String.Format("{0:000} sec", ms);
+            TimerPane.TimerLabel_Seconds.Content = String.Format("{0}", sec);
+            TimerPane.TimerLabel_Millis.Content = String.Format("{0:000} sec", ms);
 
             string str;
             switch (status)
@@ -245,13 +245,21 @@ namespace TimerTool
                     str = "P A U S E D"; break;
             }
 
-            StatusLabel.Content = str;
-            InfoLabel_Mouse.Visibility = status == 1 ? Visibility.Visible : Visibility.Hidden;
+            TimerPane.StatusLabel.Content = str;
+            ControlPane.InfoLabel_Mouse.Visibility = status == 1 ? Visibility.Visible : Visibility.Hidden;
 
             if (captureKey == 0)
             {
-                UpdateKeyBtn(StartBtn, key_Start.KeyName);
-                UpdateKeyBtn(ResetBtn, key_Reset.KeyName);
+                if (ControlPane.IsVisible)
+                {
+                    UpdateKeyBtn(ControlPane.StartBtn, key_Start.KeyName);
+                    UpdateKeyBtn(ControlPane.ResetBtn, key_Reset.KeyName);
+                }
+                if (SettingsPane.IsVisible)
+                {
+                    UpdateKeyBtn(SettingsPane.StartButton, key_Start.KeyName);
+                    UpdateKeyBtn(SettingsPane.ResetButton, key_Reset.KeyName);
+                }
             }
         }
 
@@ -263,7 +271,32 @@ namespace TimerTool
             control.Content = key + " " + text.Substring(text.IndexOf("|"));
         }
 
-        private void StartBtn_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (captureKey == 0) return;
+
+            KeyInfo key = new KeyInfo(e.Key);
+
+            if (captureKey == 1) key_Start = key;           
+            if (captureKey == 2) key_Reset = key;
+        
+            UnregisterHotKey();
+            RegisterHotKey();
+
+            captureKey = 0;
+        }
+
+        private void ControlPane_StartButtonClick(object sender, EventArgs e)
+        {
+            OnStartKeyPressed();
+        }
+
+        private void ControlPane_ResetButtonClick(object sender, EventArgs e)
+        {
+            OnResetKeyPressed();
+        }
+
+        private void SettingsPane_StartKeyChange(object sender, EventArgs e)
         {
             if (captureKey == 1)
             {
@@ -272,10 +305,10 @@ namespace TimerTool
             }
             if (captureKey != 0) return;
             captureKey = 1;
-            UpdateKeyBtn(StartBtn, "\u2423"); // OpenBox char
+            UpdateKeyBtn(SettingsPane.StartButton, "\u2423"); // OpenBox char
         }
 
-        private void ResetBtn_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void SettingsPane_ResetKeyChange(object sender, EventArgs e)
         {
             if (captureKey == 2)
             {
@@ -284,33 +317,23 @@ namespace TimerTool
             }
             if (captureKey != 0) return;
             captureKey = 2;
-            UpdateKeyBtn(ResetBtn, "\u2423"); // OpenBox char
+            UpdateKeyBtn(SettingsPane.ResetButton , "\u2423"); // OpenBox char
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ControlPane_PaneToggle(object sender, Controls.PaneToggleEventArgs e)
         {
-            if (captureKey == 0) return;
-
-            KeyInfo key = new KeyInfo(e.Key);
-
-            if (captureKey == 1) key_Start = key;           
-            if (captureKey == 2)  key_Reset = key;
-        
-            UnregisterHotKey();
-            RegisterHotKey();
-
-            captureKey = 0;
+            if (e.Visibility == Visibility.Hidden)
+            {
+                SettingsPane.Show();
+            }
         }
 
-        private void StartBtn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void SettingsPane_PaneToggle(object sender, Controls.PaneToggleEventArgs e)
         {
-            OnStartKeyPressed();
+            if (e.Visibility == Visibility.Hidden)
+            {
+                ControlPane.Show();
+            }
         }
-
-        private void ResetBtn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            OnResetKeyPressed();
-        }
-
     }
 }
